@@ -3,25 +3,24 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tiago <tiago@student.42.fr>                +#+  +:+       +#+        */
+/*   By: tsimao-g <tsimao-g@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/13 18:08:56 by tiago             #+#    #+#             */
-/*   Updated: 2026/01/13 19:44:30 by tiago            ###   ########.fr       */
+/*   Updated: 2026/01/14 23:24:29 by tsimao-g         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char	*ft_join_and_free(char *text, char *buffer)
+char	*join_and_free(char *text, char *buffer)
 {
 	char	*temp;
 
 	temp = ft_strjoin(text, buffer);
-	free(text);
-	return (temp);
+	return (free(text), temp);
 }
 
-char	*read_first_line(int fd, char *text)
+char	*read_line(int fd, char *text)
 {
 	char	*buffer;
 	int		bytes_read;
@@ -36,18 +35,13 @@ char	*read_first_line(int fd, char *text)
 	{
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
 		if (bytes_read == -1)
-		{
-			free (text);
-			free (buffer);
-			return (NULL);
-		}
+			return (free (text), free (buffer), NULL);
 		buffer[bytes_read] = 0;
-		text = ft_join_and_free(text, buffer);
+		text = join_and_free(text, buffer);
 		if (ft_strchr(text, '\n'))
 			break ;
 	}
-	free (buffer);
-	return (text);
+	return (free (buffer), text);
 }
 
 char	*ft_get_line(char *text)
@@ -72,7 +66,7 @@ char	*ft_get_line(char *text)
 	return (str);
 }
 
-char	*clean_first_line(char *text)
+char	*clean_line(char *text)
 {
 	int		i;
 	int		j;
@@ -83,18 +77,14 @@ char	*clean_first_line(char *text)
 	while (text[i] && text[i] != '\n')
 		i++;
 	if (!text[i])
-	{
-		free (text);
-		return (NULL);
-	}
+		return (free (text), NULL);
 	str = ft_calloc((ft_strlen(text) - i + 1), sizeof(*text));
 	if (!str)
 		return (NULL);
 	while (text[++i])
 		str[j++] = text[i];
 	str[j] = '\0';
-	free (text);
-	return (str);
+	return (free (text), str);
 }
 
 char	*get_next_line(int fd)
@@ -104,10 +94,42 @@ char	*get_next_line(int fd)
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	text = read_first_line(fd, text);
+	text = read_line(fd, text);
 	if (!text)
 		return (NULL);
 	output_text = ft_get_line(text);
-	text = clean_first_line(text);
+	text = clean_line(text);
 	return (output_text);
 }
+
+// int	main(void)
+// {
+//     int		fd;
+//     char	*line;
+
+//     // test with a normal file
+//     fd = open("teste.txt", O_RDONLY);
+//     if (fd == -1)
+//     {
+//         printf("Error opening file\n");
+//         return (1);
+//     }
+//     printf("Reading teste.txt\n");
+//     while ((line = get_next_line(fd)) != NULL)
+//     {
+//         printf("%s", line);
+//         free(line);
+//     }
+//     close(fd);
+
+//     // test with empty file
+//     printf("\nReading empty.txt\n");
+//     fd = open("empty.txt", O_RDONLY);
+//     line = get_next_line(fd);
+//     printf("First call: %s\n", line);  // should print (null)
+//     line = get_next_line(fd);
+//     printf("Second call: %s\n", line); // should print (null)
+//     close(fd);
+
+//     return (0);
+// }
