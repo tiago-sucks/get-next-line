@@ -1,45 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tsimao-g <tsimao-g@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/01/13 18:08:56 by tiago             #+#    #+#             */
-/*   Updated: 2026/01/15 14:51:08 by tsimao-g         ###   ########.fr       */
+/*   Created: 2026/01/15 14:53:53 by tsimao-g          #+#    #+#             */
+/*   Updated: 2026/01/15 15:37:25 by tsimao-g         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 char	*get_next_line(int fd)
 {
 	char		*output_text;
-	static char	*text;
+	static char	*text[FOPEN_MAX];
 
-	if (fd < 0 || BUFFER_SIZE <= 0)
+	if (BUFFER_SIZE <= 0 || fd < 0 || fd > FOPEN_MAX)
 		return (NULL);
-	text = read_line(fd, text);
-	if (!text)
+	text[fd] = read_line(fd, text[fd]);
+	if (!text[fd])
 		return (NULL);
-	output_text = ft_get_line(text);
-	text = clean_line(text);
+	output_text = ft_get_line(text[fd]);
+	text[fd] = clean_line(text[fd]);
 	return (output_text);
 }
-
-// int main(void)
-// {
-//     int     fd;
-//     char    *line;
-
-//     fd = open("example.txt", O_RDONLY);
-//     if (fd == -1)
-//         return (1);
-//     while ((line = get_next_line(fd)) != NULL)
-//     {
-//         printf("%s", line);
-//         free(line);
-//     }
-//     close(fd);
-//     return (0);
-// }
